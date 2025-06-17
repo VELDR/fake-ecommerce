@@ -154,13 +154,12 @@ export function LoginForm() {
 					disabled={!isValid || isPending}
 					sx={{
 						py: 1.8,
-						textTransform: 'none',
 						fontSize: '1.1rem',
 						fontWeight: 600,
 						borderRadius: 2,
 						background: 'linear-gradient(45deg, #667eea, #764ba2)',
 						'&:hover': {
-							background: 'linear-gradient(45deg, #5a6fd8, #6a3f89)',
+							opacity: 0.9,
 						},
 						'&:disabled': {
 							background: 'rgba(0, 0, 0, 0.12)',
