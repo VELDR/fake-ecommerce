@@ -2,6 +2,7 @@ import { Container } from '@mui/material';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
 import { Navbar } from '@/components/ui/Navbar';
+import { CartSnackbar } from '@/features/cart/components/CartSnackbar';
 import { ProductGrid } from '@/features/product/components/ProductGrid';
 import { getQueryClient } from '@/lib/getQueryClient';
 import { productAPI } from '@/services/product/productService';
@@ -17,14 +18,12 @@ export default async function Home() {
 	return (
 		<>
 			<Navbar />
-			<Container
-				maxWidth="lg"
-				sx={{ minHeight: '100vh', position: 'relative' }}
-			>
+			<Container maxWidth="lg" sx={{ position: 'relative' }}>
 				<HydrationBoundary state={dehydrate(queryClient)}>
 					<ProductGrid />
 				</HydrationBoundary>
 			</Container>
+			<CartSnackbar />
 		</>
 	);
 }

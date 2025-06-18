@@ -1,8 +1,30 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
 import { Box } from '@mui/material';
+
+import { useHydration } from '@/hooks/useHydration';
+import { useAuthStore } from '@/store/authStore';
 
 import { LoginForm } from '../components/LoginForm';
 
 const LoginPage = () => {
+	const { isAuthenticated } = useAuthStore();
+	const router = useRouter();
+	const isHydrated = useHydration();
+
+	useEffect(() => {
+		if (isHydrated && isAuthenticated) {
+			router.push('/');
+		}
+	}, [isHydrated, isAuthenticated, router]);
+
+	if (isHydrated && isAuthenticated) {
+		return null;
+	}
+
 	return (
 		<Box
 			sx={{

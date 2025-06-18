@@ -1,7 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { MouseEvent, useMemo } from 'react';
 
 import { Add, Remove, ShoppingCart } from '@mui/icons-material';
 import {
@@ -18,52 +17,41 @@ import {
 	Typography,
 } from '@mui/material';
 
-import { useAuthStore } from '@/store/authStore';
+import { useCartActions } from '@/hooks/useCartActions';
+import { useHydration } from '@/hooks/useHydration';
+import { useCartStore } from '@/store/cartStore';
 import type { Product } from '@/types/product';
 
 interface ProductCardProps {
 	product: Product;
+	onViewProduct: (product: Product) => void;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
-	const [cartQuantity, setCartQuantity] = useState(0);
-	const { isAuthenticated } = useAuthStore();
-	const router = useRouter();
+export function ProductCard({ product, onViewProduct }: ProductCardProps) {
+	const { getItemQuantity } = useCartStore();
+	const { handleAddToCart, handleIncreaseQuantity, handleDecreaseQuantity } =
+		useCartActions();
+	const isHydrated = useHydration();
 
-	const productMetadata = useMemo(() => {
+	const cartQuantity = isHydrated ? getItemQuantity(product.id) : 0;
+
+	const { rating, soldCount } = useMemo(() => {
 		if (product.rating && product.soldCount) {
 			return {
-				randomRating: product.rating,
+				rating: product.rating,
 				soldCount: product.soldCount,
 			};
 		}
 
 		return {
-			randomRating: 4.0,
-			soldCount: '100 sold',
+			randomRating: 0,
+			soldCount: '0 sold',
 		};
 	}, [product]);
 
-	const handleAddToCart = () => {
-		// Check if user is authenticated before adding to cart
-		if (!isAuthenticated) {
-			router.push('/login');
-			return;
-		}
-
-		setCartQuantity(1);
-	};
-
-	const handleIncreaseQuantity = () => {
-		setCartQuantity((prev) => prev + 1);
-	};
-
-	const handleDecreaseQuantity = () => {
-		if (cartQuantity > 1) {
-			setCartQuantity((prev) => prev - 1);
-		} else {
-			setCartQuantity(0);
-		}
+	const handleCartAction = (e: MouseEvent, action: () => void) => {
+		e.stopPropagation();
+		action();
 	};
 
 	return (
@@ -73,11 +61,13 @@ export function ProductCard({ product }: ProductCardProps) {
 				display: 'flex',
 				flexDirection: 'column',
 				transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+				cursor: 'pointer',
 				'&:hover': {
 					transform: 'translateY(-4px)',
-					boxShadow: (theme) => theme.shadows[8],
+					boxShadow: 8,
 				},
 			}}
+			onClick={() => onViewProduct(product)}
 		>
 			<CardMedia
 				component="img"
@@ -87,10 +77,9 @@ export function ProductCard({ product }: ProductCardProps) {
 				sx={{
 					objectFit: 'contain',
 					padding: 2,
-					backgroundColor: '#fafafa',
+					backgroundColor: 'grey.50',
 				}}
 			/>
-
 			<CardContent
 				sx={{
 					flexGrow: 1,
@@ -145,19 +134,14 @@ export function ProductCard({ product }: ProductCardProps) {
 				{/* Rating and Sold Count */}
 				<Box sx={{ mb: 1 }}>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-						<Rating
-							value={productMetadata.randomRating}
-							precision={0.1}
-							size="small"
-							readOnly
-						/>
+						<Rating value={rating} precision={0.1} size="small" readOnly />
 						<Typography variant="body2" color="text.secondary">
-							({productMetadata.randomRating})
+							({rating})
 						</Typography>
 					</Box>
 
 					<Typography variant="body2" color="text.secondary">
-						{productMetadata.soldCount}
+						{soldCount}
 					</Typography>
 				</Box>
 
@@ -178,12 +162,24 @@ export function ProductCard({ product }: ProductCardProps) {
 
 			{/* Cart Actions */}
 			<CardActions sx={{ p: 2, pt: 0 }}>
-				{cartQuantity === 0 ? (
+				{!isHydrated ? (
+					<Button
+						variant="contained"
+						fullWidth
+						disabled
+						sx={{
+							py: 1,
+							fontWeight: 600,
+						}}
+					>
+						Loading...
+					</Button>
+				) : cartQuantity === 0 ? (
 					<Button
 						variant="contained"
 						fullWidth
 						startIcon={<ShoppingCart />}
-						onClick={handleAddToCart}
+						onClick={(e) => handleCartAction(e, () => handleAddToCart(product))}
 						sx={{
 							py: 1,
 							fontWeight: 600,
@@ -202,7 +198,11 @@ export function ProductCard({ product }: ProductCardProps) {
 						}}
 					>
 						<IconButton
-							onClick={handleDecreaseQuantity}
+							onClick={(e) =>
+								handleCartAction(e, () =>
+									handleDecreaseQuantity(product.id, cartQuantity)
+								)
+							}
 							sx={{
 								border: 1,
 								borderColor: 'primary.main',
@@ -228,7 +228,11 @@ export function ProductCard({ product }: ProductCardProps) {
 						</Typography>
 
 						<IconButton
-							onClick={handleIncreaseQuantity}
+							onClick={(e) =>
+								handleCartAction(e, () =>
+									handleIncreaseQuantity(product.id, cartQuantity)
+								)
+							}
 							sx={{
 								border: 1,
 								borderColor: 'primary.main',

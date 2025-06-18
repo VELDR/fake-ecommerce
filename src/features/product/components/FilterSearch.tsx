@@ -112,12 +112,14 @@ export const FilterSearch = ({
 						placeholder="Search products..."
 						value={searchQuery}
 						onChange={(e) => onSearchChange(e.target.value)}
-						InputProps={{
-							startAdornment: (
-								<InputAdornment position="start">
-									<Search color="primary" fontSize="small" />
-								</InputAdornment>
-							),
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<Search color="primary" fontSize="small" />
+									</InputAdornment>
+								),
+							},
 						}}
 						sx={{
 							'& .MuiOutlinedInput-root': {
@@ -265,7 +267,6 @@ export const FilterSearch = ({
 					</Typography>
 				</Box>
 
-				{/* Search Bar */}
 				<Box sx={{ mb: 3 }}>
 					<Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
 						Search
@@ -276,12 +277,14 @@ export const FilterSearch = ({
 						placeholder="Search products..."
 						value={searchQuery}
 						onChange={(e) => onSearchChange(e.target.value)}
-						InputProps={{
-							startAdornment: (
-								<InputAdornment position="start">
-									<Search color="primary" fontSize="small" />
-								</InputAdornment>
-							),
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<Search color="primary" fontSize="small" />
+									</InputAdornment>
+								),
+							},
 						}}
 						sx={{
 							'& .MuiOutlinedInput-root': {

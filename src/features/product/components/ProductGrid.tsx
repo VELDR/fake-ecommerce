@@ -2,19 +2,27 @@
 
 import { useMemo, useState } from 'react';
 
-import { Alert, Box, CircularProgress, Typography } from '@mui/material';
+import { Alert, Box, Typography } from '@mui/material';
 
 import { useProducts } from '@/hooks/api/useProducts';
 import type { Product } from '@/types/product';
 
 import { FilterSearch } from './FilterSearch';
 import { ProductCard } from './ProductCard';
+import { ProductDialog } from './ProductDialog';
 
 export function ProductGrid() {
-	const { data: products, isLoading, error } = useProducts();
+	const { data: products, error } = useProducts();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [sortBy, setSortBy] = useState('default');
+	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+	const [dialogOpen, setDialogOpen] = useState(false);
+
+	const handleViewProduct = (product: Product) => {
+		setSelectedProduct(product);
+		setDialogOpen(true);
+	};
 
 	const filteredAndSortedProducts = useMemo(() => {
 		if (!products) return [];
@@ -55,21 +63,6 @@ export function ProductGrid() {
 
 		return filtered;
 	}, [products, searchQuery, selectedCategories, sortBy]);
-
-	if (isLoading) {
-		return (
-			<Box
-				sx={{
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-					minHeight: '90vh',
-				}}
-			>
-				<CircularProgress size={60} />
-			</Box>
-		);
-	}
 
 	if (error) {
 		return (
@@ -158,12 +151,21 @@ export function ProductGrid() {
 							}}
 						>
 							{filteredAndSortedProducts.map((product: Product) => (
-								<ProductCard key={product.id} product={product} />
+								<ProductCard
+									key={product.id}
+									product={product}
+									onViewProduct={handleViewProduct}
+								/>
 							))}
 						</Box>
 					)}
 				</Box>
 			</Box>
+			<ProductDialog
+				product={selectedProduct}
+				open={dialogOpen}
+				onClose={() => setDialogOpen(false)}
+			/>
 		</Box>
 	);
 }

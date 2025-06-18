@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { ShoppingCart } from '@mui/icons-material';
 import {
 	AppBar,
 	Avatar,
+	Badge,
 	Box,
 	Button,
 	IconButton,
@@ -15,13 +17,17 @@ import {
 	Typography,
 } from '@mui/material';
 
+import { useHydration } from '@/hooks/useHydration';
 import { useAuthStore } from '@/store/authStore';
+import { useCartStore } from '@/store/cartStore';
 import { formatFullName, getFullNameInitials } from '@/utils/general';
 
 export function Navbar() {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const { user, logout, isAuthenticated } = useAuthStore();
+	const { totalItems } = useCartStore();
 	const router = useRouter();
+	const isHydrated = useHydration();
 
 	const firstName = user?.name?.firstname || '';
 	const lastName = user?.name?.lastname || '';
@@ -47,22 +53,36 @@ export function Navbar() {
 
 	return (
 		<AppBar position="static" elevation={1}>
-			<Toolbar>
-				<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+			<Toolbar variant="dense" sx={{ justifyContent: 'space-between' }}>
+				<Typography variant="h6" component="a" href="/">
 					UnrealStuff
 				</Typography>
 
-				{isAuthenticated ? (
+				{!isHydrated ? (
+					<Box sx={{ width: 100, height: 40 }} />
+				) : isAuthenticated ? (
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+						<IconButton
+							href="/cart"
+							is="a"
+							sx={{
+								color: 'inherit',
+							}}
+						>
+							<Badge badgeContent={totalItems} color="secondary">
+								<ShoppingCart />
+							</Badge>
+						</IconButton>
 						<Typography variant="body2" color="inherit">
 							{displayName}
 						</Typography>
 						<IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
 							<Avatar
 								sx={{
-									bgcolor: 'secondary.main',
-									width: 40,
-									height: 40,
+									backgroundColor: 'secondary.main',
+									width: 30,
+									height: 30,
+									fontSize: '1rem',
 								}}
 							>
 								{getFullNameInitials(firstName, lastName)}
