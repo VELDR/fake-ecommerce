@@ -44,7 +44,6 @@ export const useAuthStore = create<AuthStore>()(
 					user: null,
 					isAuthenticated: false,
 					error: null,
-					successMessage: null,
 				}),
 			clearError: () => set({ error: null }),
 			clearSuccessMessage: () => set({ successMessage: null }),

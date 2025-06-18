@@ -25,7 +25,7 @@ import { formatFullName, getFullNameInitials } from '@/utils/general';
 
 export function Navbar() {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-	const { user, logout, isAuthenticated } = useAuthStore();
+	const { user, logout, isAuthenticated, setSuccessMessage } = useAuthStore();
 	const { totalItems, clearCart } = useCartStore();
 	const router = useRouter();
 	const isHydrated = useHydration();
@@ -45,6 +45,7 @@ export function Navbar() {
 		clearCart();
 		logout();
 		handleMenuClose();
+		setSuccessMessage('Logout successful!');
 		router.push('/login');
 	};
 
