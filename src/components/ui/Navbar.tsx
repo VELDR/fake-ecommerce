@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { ShoppingCart } from '@mui/icons-material';
@@ -25,7 +26,7 @@ import { formatFullName, getFullNameInitials } from '@/utils/general';
 export function Navbar() {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const { user, logout, isAuthenticated } = useAuthStore();
-	const { totalItems } = useCartStore();
+	const { totalItems, clearCart } = useCartStore();
 	const router = useRouter();
 	const isHydrated = useHydration();
 
@@ -41,6 +42,7 @@ export function Navbar() {
 	};
 
 	const handleLogout = () => {
+		clearCart();
 		logout();
 		handleMenuClose();
 		router.push('/login');
@@ -91,7 +93,7 @@ export function Navbar() {
 					</Box>
 				) : (
 					<Button
-						component="a"
+						component={Link}
 						variant="outlined"
 						color="inherit"
 						href="/login"

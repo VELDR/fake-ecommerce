@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import {
 	Box,
 	Button,
@@ -121,7 +123,7 @@ export function CartSummary({ onCheckout }: CartSummaryProps) {
 					variant="outlined"
 					fullWidth
 					size="large"
-					component="a"
+					component={Link}
 					href="/"
 					sx={{
 						py: 1.5,
